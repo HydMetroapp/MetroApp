@@ -2,12 +2,7 @@
 {
   "version": 2,
   "name": "metroapp",
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/next"
-    }
-  ],
+  
   "routes": [
     {
       "src": "/sw.js",
