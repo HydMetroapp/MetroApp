@@ -1,7 +1,7 @@
 
 {
   "version": 2,
-  "name": "hyderabad-metro-pwa",
+  "name": "metroapp",
   "builds": [
     {
       "src": "package.json",
