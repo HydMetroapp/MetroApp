@@ -3,8 +3,9 @@
   "name": "metroapp",
   "framework": "nextjs",
   "rootDirectory": "app",
-  "buildCommand": "next build",
+  "buildCommand": "npm run vercel-build",
   "outputDirectory": ".next",
+  
   "routes": [
     {
       "src": "/sw.js",
