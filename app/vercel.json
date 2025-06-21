@@ -2,6 +2,8 @@
   "version": 2,
   "name": "metroapp",
   "rootDirectory": "app",
+  "buildCommand": "cd app && next build",
+  "outputDirectory": "app/.next",
   "routes": [
     {
       "src": "/sw.js",
