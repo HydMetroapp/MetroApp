@@ -79,7 +79,9 @@ export function useGeofencing(): UseGeofencingReturn {
         const interval = setInterval(updateLocation, 5000); // Update every 5 seconds
 
         // Clean up interval when monitoring stops
-        return () => clearInterval(interval);
+        const cleanup = () => clearInterval(interval);
+        // Store cleanup function for later use
+        (window as any).__geofenceCleanup = cleanup;
       }
 
       return success;

@@ -71,17 +71,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Log QR generation for audit
-    await prisma.qrLog.create({
-      data: {
-        userId,
-        stationId,
-        type,
-        journeyId,
-        generatedAt: new Date(),
-        expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
-      }
-    }).catch(console.error); // Don't fail if logging fails
+    // Log QR generation for audit (optional - don't fail if table doesn't exist)
+    try {
+      await (prisma as any).qrLog?.create({
+        data: {
+          userId,
+          stationId,
+          type,
+          journeyId,
+          generatedAt: new Date(),
+          expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
+        }
+      });
+    } catch (error) {
+      console.warn('QR logging failed (table may not exist):', error);
+    }
 
     return NextResponse.json({
       qrCode,

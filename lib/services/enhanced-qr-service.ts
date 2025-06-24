@@ -265,11 +265,11 @@ export class EnhancedQRService {
   private static cleanupExpiredQRCodes(): void {
     const now = Date.now();
     
-    for (const [token, qrData] of this.activeQRCodes.entries()) {
+    this.activeQRCodes.forEach((qrData, token) => {
       if (now > qrData.validUntil) {
         this.activeQRCodes.delete(token);
       }
-    }
+    });
   }
 
   // Get active QR codes count (for debugging)

@@ -20,16 +20,20 @@ export async function POST(request: NextRequest) {
     const validationResult = await EnhancedQRService.validateStationQR(qrCode, scannerId);
 
     if (!validationResult.isValid) {
-      // Log failed validation
-      await prisma.scanLog.create({
-        data: {
-          scannerId,
-          qrCode: qrCode.substring(0, 100), // Store partial for debugging
-          success: false,
-          error: validationResult.error,
-          scannedAt: new Date(),
-        }
-      }).catch(console.error);
+      // Log failed validation (optional)
+      try {
+        await (prisma as any).scanLog?.create({
+          data: {
+            scannerId,
+            qrCode: qrCode.substring(0, 100), // Store partial for debugging
+            success: false,
+            error: validationResult.error,
+            scannedAt: new Date(),
+          }
+        });
+      } catch (error) {
+        console.warn('Scan logging failed:', error);
+      }
 
       return NextResponse.json(
         { 
@@ -85,18 +89,22 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Log successful scan
-      await prisma.scanLog.create({
-        data: {
-          scannerId,
-          userId: qrData.userId,
-          stationId: qrData.stationId,
-          journeyId: journeyResult?.id,
-          qrType: qrData.type,
-          success: true,
-          scannedAt: new Date(),
-        }
-      }).catch(console.error);
+      // Log successful scan (optional)
+      try {
+        await (prisma as any).scanLog?.create({
+          data: {
+            scannerId,
+            userId: qrData.userId,
+            stationId: qrData.stationId,
+            journeyId: journeyResult?.id,
+            qrType: qrData.type,
+            success: true,
+            scannedAt: new Date(),
+          }
+        });
+      } catch (error) {
+        console.warn('Scan logging failed:', error);
+      }
 
       return NextResponse.json({
         success: true,
@@ -113,18 +121,22 @@ export async function POST(request: NextRequest) {
       });
 
     } catch (journeyError: any) {
-      // Log journey error but still record the scan attempt
-      await prisma.scanLog.create({
-        data: {
-          scannerId,
-          userId: qrData.userId,
-          stationId: qrData.stationId,
-          qrType: qrData.type,
-          success: false,
-          error: journeyError.message,
-          scannedAt: new Date(),
-        }
-      }).catch(console.error);
+      // Log journey error but still record the scan attempt (optional)
+      try {
+        await (prisma as any).scanLog?.create({
+          data: {
+            scannerId,
+            userId: qrData.userId,
+            stationId: qrData.stationId,
+            qrType: qrData.type,
+            success: false,
+            error: journeyError.message,
+            scannedAt: new Date(),
+          }
+        });
+      } catch (error) {
+        console.warn('Scan logging failed:', error);
+      }
 
       return NextResponse.json(
         { 
