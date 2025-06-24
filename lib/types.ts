@@ -194,6 +194,10 @@ export interface QRCodeData {
   stationCode: string;
   timestamp: number;
   type: 'entry' | 'exit';
+  token?: string;
+  userId?: string;
+  validUntil?: number;
+  journeyId?: string;
 }
 
 // PWA

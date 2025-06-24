@@ -13,7 +13,9 @@ import { useAuth } from '@/hooks/use-auth';
 import { useJourney } from '@/hooks/use-journey';
 import { useMetroCard } from '@/hooks/use-metro-card';
 import { useLocation } from '@/hooks/use-location';
+import { useGeofencing } from '@/hooks/use-geofencing';
 import { formatCurrency } from '@/lib/utils';
+import { JourneyStatus } from '@/components/metro/journey-status';
 import Link from 'next/link';
 
 export default function HomePage() {
@@ -21,15 +23,40 @@ export default function HomePage() {
   const { activeJourney, journeyHistory } = useJourney();
   const { metroCards, rechargeCard } = useMetroCard();
   const { location, nearestStation } = useLocation();
+  const { 
+    isMonitoring, 
+    currentGeofences, 
+    startMonitoring, 
+    onGeofenceEvent,
+    hasLocationPermission 
+  } = useGeofencing();
   const [stations, setStations] = useState([]);
 
   useEffect(() => {
     // Fetch stations for location service
     fetch('/api/stations')
       .then(res => res.json())
-      .then(data => setStations(data.stations || []))
+      .then(data => {
+        const stationData = data.stations || [];
+        setStations(stationData);
+        
+        // Start geofencing monitoring if user is authenticated
+        if (isAuthenticated && hasLocationPermission && stationData.length > 0) {
+          startMonitoring(stationData);
+        }
+      })
       .catch(console.error);
-  }, []);
+  }, [isAuthenticated, hasLocationPermission]);
+
+  useEffect(() => {
+    // Set up geofence event handler
+    const handleGeofenceEvent = (event) => {
+      console.log('Geofence event:', event);
+      // Handle geofence entry/exit events here
+    };
+
+    onGeofenceEvent(handleGeofenceEvent);
+  }, [onGeofenceEvent]);
 
   if (!isAuthenticated) {
     return (
@@ -103,16 +130,20 @@ export default function HomePage() {
           </p>
         </div>
 
-        {/* Active Journey */}
-        {activeJourney && (
-          <div className="space-y-3">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              <Play className="h-5 w-5 text-blue-600" />
-              Active Journey
-            </h2>
-            <JourneyCard journey={activeJourney} />
-          </div>
-        )}
+        {/* Journey Status with QR Integration */}
+        <div className="space-y-3">
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            <Play className="h-5 w-5 text-blue-600" />
+            Journey Status
+          </h2>
+          <JourneyStatus 
+            stationId={currentGeofences.length > 0 ? currentGeofences[0].id : undefined}
+            stationName={currentGeofences.length > 0 ? currentGeofences[0].name : undefined}
+            onJourneyUpdate={(journey) => {
+              console.log('Journey updated:', journey);
+            }}
+          />
+        </div>
 
         {/* Quick Actions */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

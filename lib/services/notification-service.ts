@@ -242,4 +242,53 @@ export class NotificationService {
       NotificationType.SUCCESS
     );
   }
+
+  // Geofencing notifications
+  static async notifyGeofenceEntry(stationName: string): Promise<void> {
+    const notification: AppNotification = {
+      id: Date.now().toString(),
+      userId: '', // Will be set by the system
+      title: 'Station Area Detected',
+      message: `You're near ${stationName} station. QR code ready for entry.`,
+      type: NotificationType.INFO,
+      isRead: false,
+      data: { stationName, type: 'geofence_entry' },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    this.showBrowserNotification(notification);
+  }
+
+  static async notifyGeofenceExit(stationName: string): Promise<void> {
+    const notification: AppNotification = {
+      id: Date.now().toString(),
+      userId: '', // Will be set by the system
+      title: 'Left Station Area',
+      message: `You've left ${stationName} station area.`,
+      type: NotificationType.INFO,
+      isRead: false,
+      data: { stationName, type: 'geofence_exit' },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    this.showBrowserNotification(notification);
+  }
+
+  static async notifyQRGenerated(stationName: string, type: 'entry' | 'exit'): Promise<void> {
+    const notification: AppNotification = {
+      id: Date.now().toString(),
+      userId: '', // Will be set by the system
+      title: 'QR Code Ready',
+      message: `${type === 'entry' ? 'Entry' : 'Exit'} QR code generated for ${stationName}`,
+      type: NotificationType.SUCCESS,
+      isRead: false,
+      data: { stationName, qrType: type },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    this.showBrowserNotification(notification);
+  }
 }

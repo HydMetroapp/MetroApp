@@ -173,6 +173,45 @@ model FareRule {
   @@map("fare_rules")
 }
 
+model QrLog {
+  id          String   @id @default(cuid())
+  userId      String
+  stationId   String
+  type        String   // 'entry' or 'exit'
+  journeyId   String?
+  generatedAt DateTime @default(now())
+  expiresAt   DateTime
+  
+  @@map("qr_logs")
+}
+
+model ScanLog {
+  id          String   @id @default(cuid())
+  scannerId   String
+  userId      String?
+  stationId   String?
+  journeyId   String?
+  qrCode      String?  // Partial QR code for debugging
+  qrType      String?  // 'entry' or 'exit'
+  success     Boolean
+  error       String?
+  scannedAt   DateTime @default(now())
+  
+  @@map("scan_logs")
+}
+
+model Scanner {
+  id        String   @id @default(cuid())
+  stationId String
+  type      String   // 'entry' or 'exit'
+  location  String?  // Description of scanner location
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("scanners")
+}
+
 // Enums
 enum CardType {
   REGULAR
